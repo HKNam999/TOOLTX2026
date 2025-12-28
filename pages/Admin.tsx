@@ -1,22 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { storageService } from '../services/storage';
-import { Transaction, BankAccount, TransactionType, TransactionStatus, BANKS_LIST } from '../types';
+import { Transaction, BankAccount, TransactionType, TransactionStatus, BANKS_LIST, User } from '../types';
 
 const Admin: React.FC = () => {
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [banks, setBanks] = useState<BankAccount[]>([]);
-  const [activeTab, setActiveTab] = useState<'overview' | 'banks' | 'deposits'>('overview');
+  const [users, setUsers] = useState<User[]>([]);
+  const [activeTab, setActiveTab] = useState<'overview' | 'banks' | 'deposits' | 'users'>('overview');
   
   // Add Bank Form State
   const [newBankName, setNewBankName] = useState('MBBANK');
   const [newAccNum, setNewAccNum] = useState('');
   const [newAccName, setNewAccName] = useState('');
 
+  // User Management States
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showUserDetail, setShowUserDetail] = useState(false);
+  const [editBalance, setEditBalance] = useState('0');
+  const [searchUser, setSearchUser] = useState('');
+
   const refreshData = () => {
     setTransactions(storageService.adminGetTransactions());
     setBanks(storageService.adminGetBanks());
+    setUsers(storageService.adminGetAllUsers());
   };
 
   useEffect(() => {
@@ -61,6 +69,49 @@ const Admin: React.FC = () => {
       alert('Xóa ngân hàng thành công!');
     }
   };
+
+  // User Management Handlers
+  const handleViewUser = (user: User) => {
+    setSelectedUser(user);
+    setEditBalance(user.balance.toString());
+    setShowUserDetail(true);
+  };
+
+  const handleUpdateBalance = () => {
+    if (!selectedUser) return;
+    const newBalance = parseFloat(editBalance);
+    if (isNaN(newBalance) || newBalance < 0) {
+      alert('Số dư không hợp lệ');
+      return;
+    }
+    storageService.adminUpdateUserBalance(selectedUser.id, newBalance);
+    alert('Cập nhật số dư thành công!');
+    refreshData();
+    setShowUserDetail(false);
+  };
+
+  const handleToggleLock = (userId: string) => {
+    const user = users.find(u => u.id === userId);
+    if (window.confirm(`${user?.locked ? 'Mở khóa' : 'Khóa'} tài khoản ${user?.username}?`)) {
+      storageService.adminToggleLockUser(userId);
+      alert(`${user?.locked ? 'Mở khóa' : 'Khóa'} tài khoản thành công!`);
+      refreshData();
+    }
+  };
+
+  const handleDeleteUser = (userId: string) => {
+    const user = users.find(u => u.id === userId);
+    if (window.confirm(`Xóa vĩnh viễn tài khoản ${user?.username}? Hành động này không thể hoàn tác!`)) {
+      storageService.adminDeleteUser(userId);
+      alert('Xóa tài khoản thành công!');
+      refreshData();
+    }
+  };
+
+  const filteredUsers = users.filter(u => 
+    u.username.toLowerCase().includes(searchUser.toLowerCase()) ||
+    u.id.toLowerCase().includes(searchUser.toLowerCase())
+  );
 
   const handleLogout = () => {
     storageService.logout();
@@ -111,10 +162,10 @@ const Admin: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Tabs */}
-        <div className="flex space-x-2 mb-8 border-b border-gray-700">
+        <div className="flex space-x-2 mb-8 border-b border-gray-700 overflow-x-auto">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`px-6 py-3 font-semibold border-b-2 transition ${
+            className={`px-6 py-3 font-semibold border-b-2 transition whitespace-nowrap ${
               activeTab === 'overview'
                 ? 'text-gold-500 border-gold-500'
                 : 'text-gray-400 border-transparent hover:text-white'
@@ -124,7 +175,7 @@ const Admin: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('deposits')}
-            className={`px-6 py-3 font-semibold border-b-2 transition ${
+            className={`px-6 py-3 font-semibold border-b-2 transition whitespace-nowrap ${
               activeTab === 'deposits'
                 ? 'text-gold-500 border-gold-500'
                 : 'text-gray-400 border-transparent hover:text-white'
@@ -133,8 +184,18 @@ const Admin: React.FC = () => {
             <i className="fas fa-inbox mr-2"></i>Đơn Nạp ({pendingDeposits})
           </button>
           <button
+            onClick={() => setActiveTab('users')}
+            className={`px-6 py-3 font-semibold border-b-2 transition whitespace-nowrap ${
+              activeTab === 'users'
+                ? 'text-gold-500 border-gold-500'
+                : 'text-gray-400 border-transparent hover:text-white'
+            }`}
+          >
+            <i className="fas fa-users mr-2"></i>Tài Khoản ({users.length})
+          </button>
+          <button
             onClick={() => setActiveTab('banks')}
-            className={`px-6 py-3 font-semibold border-b-2 transition ${
+            className={`px-6 py-3 font-semibold border-b-2 transition whitespace-nowrap ${
               activeTab === 'banks'
                 ? 'text-gold-500 border-gold-500'
                 : 'text-gray-400 border-transparent hover:text-white'
@@ -188,11 +249,11 @@ const Admin: React.FC = () => {
               <div className="bg-gradient-to-br from-purple-600/20 to-purple-700/20 border border-purple-600/30 rounded-xl p-6 hover:border-purple-500 transition">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-400 text-sm">Số Ngân Hàng</p>
-                    <p className="text-3xl font-bold text-purple-400 mt-2">{banks.length}</p>
+                    <p className="text-gray-400 text-sm">Số Tài Khoản</p>
+                    <p className="text-3xl font-bold text-purple-400 mt-2">{users.length}</p>
                   </div>
                   <div className="w-14 h-14 bg-purple-600/30 rounded-lg flex items-center justify-center">
-                    <i className="fas fa-building text-purple-400 text-2xl"></i>
+                    <i className="fas fa-users text-purple-400 text-2xl"></i>
                   </div>
                 </div>
               </div>
@@ -297,6 +358,97 @@ const Admin: React.FC = () => {
           </div>
         )}
 
+        {/* Users Tab */}
+        {activeTab === 'users' && (
+          <div className="space-y-6">
+            {/* Search Bar */}
+            <div className="relative">
+              <input 
+                type="text"
+                placeholder="Tìm kiếm theo tên đăng nhập hoặc ID..."
+                value={searchUser}
+                onChange={(e) => setSearchUser(e.target.value)}
+                className="w-full bg-dark-800 border border-gray-700 rounded-lg py-3 px-4 pl-12 text-white focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500 transition"
+              />
+              <i className="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg"></i>
+            </div>
+
+            {/* Users Table */}
+            <div className="bg-dark-800 border border-gray-700/50 rounded-xl overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-dark-900">
+                    <tr className="text-gray-400 border-b border-gray-700">
+                      <th className="text-left py-3 px-4 whitespace-nowrap">Tên Đăng Nhập</th>
+                      <th className="text-left py-3 px-4 whitespace-nowrap">ID</th>
+                      <th className="text-right py-3 px-4 whitespace-nowrap">Số Dư</th>
+                      <th className="text-left py-3 px-4 whitespace-nowrap">Trạng Thái</th>
+                      <th className="text-left py-3 px-4 whitespace-nowrap">Ngày Tạo</th>
+                      <th className="text-left py-3 px-4 whitespace-nowrap">Hành Động</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-700">
+                    {filteredUsers.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="text-center py-8 text-gray-400">
+                          <i className="fas fa-users text-2xl mb-2 block"></i>
+                          {searchUser ? 'Không tìm thấy tài khoản' : 'Chưa có tài khoản'}
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredUsers.map(user => (
+                        <tr key={user.id} className="hover:bg-dark-700/50 transition">
+                          <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">{user.username}</td>
+                          <td className="py-3 px-4 font-mono text-xs text-gray-400 whitespace-nowrap">{user.id}</td>
+                          <td className="py-3 px-4 text-right font-bold text-green-400 whitespace-nowrap">{user.balance.toLocaleString('vi-VN')}</td>
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold inline-block ${
+                              user.locked 
+                                ? 'bg-red-600/30 text-red-400'
+                                : 'bg-green-600/30 text-green-400'
+                            }`}>
+                              {user.locked ? '🔒 Đã Khóa' : '✓ Bình Thường'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-gray-400 text-xs whitespace-nowrap">
+                            {new Date(user.createdAt).toLocaleDateString('vi-VN')}
+                          </td>
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleViewUser(user)}
+                                className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded transition whitespace-nowrap"
+                              >
+                                Chi Tiết
+                              </button>
+                              <button
+                                onClick={() => handleToggleLock(user.id)}
+                                className={`text-white text-xs px-3 py-1 rounded transition whitespace-nowrap ${
+                                  user.locked
+                                    ? 'bg-green-600 hover:bg-green-500'
+                                    : 'bg-yellow-600 hover:bg-yellow-500'
+                                }`}
+                              >
+                                {user.locked ? 'Mở Khóa' : 'Khóa'}
+                              </button>
+                              <button
+                                onClick={() => handleDeleteUser(user.id)}
+                                className="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1 rounded transition whitespace-nowrap"
+                              >
+                                Xóa
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Banks Tab */}
         {activeTab === 'banks' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -397,6 +549,73 @@ const Admin: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* User Detail Modal */}
+      {showUserDetail && selectedUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-dark-800 border border-gray-700 rounded-xl max-w-md w-full p-6 space-y-4">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white">Quản Lý Tài Khoản</h2>
+              <button
+                onClick={() => setShowUserDetail(false)}
+                className="text-gray-400 hover:text-white transition"
+              >
+                <i className="fas fa-times text-xl"></i>
+              </button>
+            </div>
+
+            {/* User Info */}
+            <div className="bg-dark-900 rounded-lg p-4 space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">Tên:</span>
+                <span className="text-white font-semibold">{selectedUser.username}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">ID:</span>
+                <span className="text-white font-mono text-xs">{selectedUser.id}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">Ngày Tạo:</span>
+                <span className="text-white">{new Date(selectedUser.createdAt).toLocaleDateString('vi-VN')}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">Trạng Thái:</span>
+                <span className={selectedUser.locked ? 'text-red-400 font-bold' : 'text-green-400 font-bold'}>
+                  {selectedUser.locked ? '🔒 Đã Khóa' : '✓ Bình Thường'}
+                </span>
+              </div>
+            </div>
+
+            {/* Edit Balance */}
+            <div>
+              <label className="block text-sm text-gray-400 mb-2 font-semibold">Cập Nhật Số Dư (VND)</label>
+              <input
+                type="number"
+                value={editBalance}
+                onChange={(e) => setEditBalance(e.target.value)}
+                className="w-full bg-dark-900 border border-gray-600 rounded-lg p-3 text-white focus:border-gold-500 focus:outline-none transition"
+                placeholder="0"
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-2 pt-4 border-t border-gray-700">
+              <button
+                onClick={handleUpdateBalance}
+                className="flex-1 bg-green-600 hover:bg-green-500 text-white font-bold py-2 rounded-lg transition"
+              >
+                <i className="fas fa-save mr-2"></i>Cập Nhật
+              </button>
+              <button
+                onClick={() => setShowUserDetail(false)}
+                className="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 rounded-lg transition"
+              >
+                Hủy
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

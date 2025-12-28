@@ -10,6 +10,7 @@ export interface User {
   balance: number;
   role: UserRole;
   createdAt: string;
+  locked?: boolean;
 }
 
 export interface BankAccount {

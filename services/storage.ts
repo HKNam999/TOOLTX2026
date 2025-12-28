@@ -237,5 +237,40 @@ export const storageService = {
   adminRemoveBank: (id: string) => {
       const banks = storageService.adminGetBanks().filter(b => b.id !== id);
       localStorage.setItem(LS_KEYS.ADMIN_BANKS, JSON.stringify(banks));
+  },
+
+  // --- USER MANAGEMENT ---
+  adminGetAllUsers: (): User[] => {
+    const users: User[] = JSON.parse(localStorage.getItem(LS_KEYS.USERS) || '[]');
+    return users.filter(u => u.role === UserRole.USER);
+  },
+
+  adminUpdateUserBalance: (userId: string, newBalance: number): void => {
+    const users: User[] = JSON.parse(localStorage.getItem(LS_KEYS.USERS) || '[]');
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex !== -1) {
+      users[userIndex].balance = newBalance;
+      localStorage.setItem(LS_KEYS.USERS, JSON.stringify(users));
+    }
+  },
+
+  adminToggleLockUser: (userId: string): void => {
+    const users: User[] = JSON.parse(localStorage.getItem(LS_KEYS.USERS) || '[]');
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex !== -1) {
+      users[userIndex].locked = !users[userIndex].locked;
+      localStorage.setItem(LS_KEYS.USERS, JSON.stringify(users));
+    }
+  },
+
+  adminDeleteUser: (userId: string): void => {
+    const users: User[] = JSON.parse(localStorage.getItem(LS_KEYS.USERS) || '[]');
+    const filteredUsers = users.filter(u => u.id !== userId);
+    localStorage.setItem(LS_KEYS.USERS, JSON.stringify(filteredUsers));
+    
+    // Also remove user's transactions
+    const transactions: Transaction[] = JSON.parse(localStorage.getItem(LS_KEYS.TRANSACTIONS) || '[]');
+    const filteredTransactions = transactions.filter(t => t.userId !== userId);
+    localStorage.setItem(LS_KEYS.TRANSACTIONS, JSON.stringify(filteredTransactions));
   }
 };
