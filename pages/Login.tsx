@@ -6,6 +6,7 @@ import { APP_NAME } from '../constants';
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -61,13 +62,22 @@ const Login: React.FC = () => {
           
           <div>
             <label className="block text-gray-400 text-sm mb-1">Mật khẩu</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-dark-900 border border-gray-600 rounded-lg p-3 text-white focus:border-gold-500 focus:outline-none transition"
-              placeholder="Nhập mật khẩu"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-dark-900 border border-gray-600 rounded-lg p-3 text-white focus:border-gold-500 focus:outline-none transition pr-10"
+                placeholder="Nhập mật khẩu"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gold-500 transition"
+              >
+                <i className={`fas fa-${showPassword ? 'eye-slash' : 'eye'}`}></i>
+              </button>
+            </div>
           </div>
 
           <button
