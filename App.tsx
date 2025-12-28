@@ -5,7 +5,8 @@ import { storageService } from './services/storage';
 
 // Pages
 import Landing from './pages/Landing';
-import Auth from './pages/Auth';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import DashboardLayout from './components/DashboardLayout';
 import DashboardHome from './pages/dashboard/Home';
 import Deposit from './pages/dashboard/Deposit';
@@ -43,7 +44,8 @@ const App: React.FC = () => {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Auth />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         
         {/* Dashboard Routes */}
         <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
