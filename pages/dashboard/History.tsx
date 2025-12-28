@@ -70,13 +70,17 @@ const History: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('vi-VN');
+    return new Date(dateString).toLocaleDateString('vi-VN');
+  };
+
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
   };
 
   const SortButton = ({ field, label }: { field: SortField; label: string }) => (
     <button
       onClick={() => handleSort(field)}
-      className={`flex items-center space-x-1 hover:text-gold-400 transition ${
+      className={`flex items-center space-x-1 hover:text-gold-400 transition whitespace-nowrap ${
         sortField === field ? 'text-gold-500 font-bold' : 'text-gray-400'
       }`}
     >
@@ -100,36 +104,36 @@ const History: React.FC = () => {
     <div className="space-y-8">
       {/* Header with Stats */}
       <div className="bg-gradient-to-r from-dark-800 to-dark-700 border border-gray-700/50 rounded-xl p-6">
-        <h1 className="text-3xl font-bold text-white mb-6 flex items-center">
+        <h1 className="text-3xl font-bold text-white mb-6 flex items-center whitespace-nowrap">
           <i className="fas fa-history text-gold-500 mr-3"></i>Lịch Sử Giao Dịch
         </h1>
         
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-dark-900/50 border border-gold-500/20 rounded-lg p-4">
-            <p className="text-gray-400 text-sm mb-1">
+            <p className="text-gray-400 text-sm mb-1 whitespace-nowrap">
               {activeTab === 'deposits' ? 'Tổng Nạp' : 'Số Lần Mua'}
             </p>
-            <p className="text-2xl font-bold text-gold-400">
+            <p className="text-2xl font-bold text-gold-400 whitespace-nowrap">
               {activeTab === 'deposits' ? stats.total.toLocaleString('vi-VN') : stats.total}
             </p>
           </div>
           <div className="bg-dark-900/50 border border-green-500/20 rounded-lg p-4">
-            <p className="text-gray-400 text-sm mb-1">Thành Công</p>
-            <p className="text-2xl font-bold text-green-400">{stats.success}</p>
+            <p className="text-gray-400 text-sm mb-1 whitespace-nowrap">Thành Công</p>
+            <p className="text-2xl font-bold text-green-400 whitespace-nowrap">{stats.success}</p>
           </div>
           <div className="bg-dark-900/50 border border-yellow-500/20 rounded-lg p-4">
-            <p className="text-gray-400 text-sm mb-1">Chờ Duyệt</p>
-            <p className="text-2xl font-bold text-yellow-400">{stats.pending}</p>
+            <p className="text-gray-400 text-sm mb-1 whitespace-nowrap">Chờ Duyệt</p>
+            <p className="text-2xl font-bold text-yellow-400 whitespace-nowrap">{stats.pending}</p>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-2 border-b border-gray-700">
+      <div className="flex space-x-2 border-b border-gray-700 overflow-x-auto">
         <button
           onClick={() => setActiveTab('deposits')}
-          className={`px-6 py-3 font-semibold border-b-2 transition flex items-center space-x-2 ${
+          className={`px-6 py-3 font-semibold border-b-2 transition flex items-center space-x-2 whitespace-nowrap ${
             activeTab === 'deposits'
               ? 'text-gold-500 border-gold-500'
               : 'text-gray-400 border-transparent hover:text-white'
@@ -140,7 +144,7 @@ const History: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('purchases')}
-          className={`px-6 py-3 font-semibold border-b-2 transition flex items-center space-x-2 ${
+          className={`px-6 py-3 font-semibold border-b-2 transition flex items-center space-x-2 whitespace-nowrap ${
             activeTab === 'purchases'
               ? 'text-gold-500 border-gold-500'
               : 'text-gray-400 border-transparent hover:text-white'
@@ -170,24 +174,24 @@ const History: React.FC = () => {
             <table className="w-full text-left text-sm text-gray-400">
               <thead className="bg-dark-900 text-gray-200 uppercase font-medium">
                 <tr className="border-b border-gray-700">
-                  <th className="px-6 py-4">Mã GD</th>
-                  <th className="px-6 py-4 cursor-pointer">
+                  <th className="px-4 py-4 whitespace-nowrap">Mã GD</th>
+                  <th className="px-4 py-4 whitespace-nowrap cursor-pointer">
                     <SortButton field="date" label="Thời gian" />
                   </th>
-                  <th className="px-6 py-4">Ngân hàng</th>
-                  <th className="px-6 py-4 text-right cursor-pointer">
+                  <th className="px-4 py-4 whitespace-nowrap">Ngân hàng</th>
+                  <th className="px-4 py-4 text-right whitespace-nowrap cursor-pointer">
                     <SortButton field="amount" label="Số tiền" />
                   </th>
-                  <th className="px-6 py-4 text-center cursor-pointer">
+                  <th className="px-4 py-4 text-center whitespace-nowrap cursor-pointer">
                     <SortButton field="status" label="Trạng thái" />
                   </th>
-                  <th className="px-6 py-4">Nội dung</th>
+                  <th className="px-4 py-4 whitespace-nowrap">Nội dung</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-700">
                 {depositTransactions.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                       <i className="fas fa-inbox text-2xl mb-2 block"></i>
                       {searchTerm ? 'Không tìm thấy giao dịch phù hợp' : 'Chưa có giao dịch nạp tiền'}
                     </td>
@@ -195,16 +199,19 @@ const History: React.FC = () => {
                 ) : (
                   depositTransactions.map((tx) => (
                     <tr key={tx.id} className="hover:bg-dark-700/50 transition">
-                      <td className="px-6 py-4 font-mono text-xs text-white">{tx.id}</td>
-                      <td className="px-6 py-4 text-gray-300">{formatDate(tx.createdAt)}</td>
-                      <td className="px-6 py-4 text-white font-semibold">{tx.metadata?.bankName || 'N/A'}</td>
-                      <td className="px-6 py-4 text-right font-bold text-green-400">+{tx.amount.toLocaleString('vi-VN')}</td>
-                      <td className="px-6 py-4 text-center">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(tx.status)}`}>
+                      <td className="px-4 py-4 font-mono text-xs text-white whitespace-nowrap">{tx.id}</td>
+                      <td className="px-4 py-4 text-gray-300 whitespace-nowrap">
+                        <div className="text-xs">{formatDate(tx.createdAt)}</div>
+                        <div className="text-xs text-gray-500">{formatTime(tx.createdAt)}</div>
+                      </td>
+                      <td className="px-4 py-4 text-white font-semibold whitespace-nowrap">{tx.metadata?.bankName || 'N/A'}</td>
+                      <td className="px-4 py-4 text-right font-bold text-green-400 whitespace-nowrap">+{tx.amount.toLocaleString('vi-VN')}</td>
+                      <td className="px-4 py-4 text-center whitespace-nowrap">
+                        <span className={`px-2 py-1 rounded-full text-xs font-bold border inline-block ${getStatusColor(tx.status)}`}>
                           {tx.status === TransactionStatus.SUCCESS ? '✓ Thành công' : '⏳ Chờ duyệt'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-xs font-mono text-gray-500">{tx.description}</td>
+                      <td className="px-4 py-4 text-xs font-mono text-gray-500 whitespace-nowrap overflow-hidden text-ellipsis">{tx.description}</td>
                     </tr>
                   ))
                 )}
@@ -220,21 +227,21 @@ const History: React.FC = () => {
             <table className="w-full text-left text-sm text-gray-400">
               <thead className="bg-dark-900 text-gray-200 uppercase font-medium">
                 <tr className="border-b border-gray-700">
-                  <th className="px-6 py-4">Mã Đơn</th>
-                  <th className="px-6 py-4 cursor-pointer">
+                  <th className="px-4 py-4 whitespace-nowrap">Mã Đơn</th>
+                  <th className="px-4 py-4 whitespace-nowrap cursor-pointer">
                     <SortButton field="date" label="Thời gian" />
                   </th>
-                  <th className="px-6 py-4">Chi tiết đơn</th>
-                  <th className="px-6 py-4 text-right cursor-pointer">
+                  <th className="px-4 py-4 whitespace-nowrap">Chi tiết đơn</th>
+                  <th className="px-4 py-4 text-right whitespace-nowrap cursor-pointer">
                     <SortButton field="amount" label="Tổng tiền" />
                   </th>
-                  <th className="px-6 py-4">Danh sách Key / Hết hạn</th>
+                  <th className="px-4 py-4 whitespace-nowrap">Danh sách Key</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-700">
                 {depositTransactions.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
                       <i className="fas fa-key text-2xl mb-2 block"></i>
                       {searchTerm ? 'Không tìm thấy lịch sử mua key phù hợp' : 'Chưa có lịch sử mua key'}
                     </td>
@@ -242,25 +249,31 @@ const History: React.FC = () => {
                 ) : (
                   depositTransactions.map((tx) => (
                     <tr key={tx.id} className="hover:bg-dark-700/50 transition">
-                      <td className="px-6 py-4 font-mono text-xs text-white align-top">{tx.id}</td>
-                      <td className="px-6 py-4 text-gray-300 align-top text-sm">{formatDate(tx.createdAt)}</td>
-                      <td className="px-6 py-4 text-white align-top">{tx.description}</td>
-                      <td className="px-6 py-4 text-right font-bold text-red-400 align-top">-{tx.amount.toLocaleString('vi-VN')}</td>
-                      <td className="px-6 py-4 align-top">
-                        <div className="space-y-2">
+                      <td className="px-4 py-4 font-mono text-xs text-white whitespace-nowrap">{tx.id}</td>
+                      <td className="px-4 py-4 text-gray-300 whitespace-nowrap">
+                        <div className="text-xs">{formatDate(tx.createdAt)}</div>
+                        <div className="text-xs text-gray-500">{formatTime(tx.createdAt)}</div>
+                      </td>
+                      <td className="px-4 py-4 text-white whitespace-nowrap overflow-hidden text-ellipsis max-w-xs">{tx.description}</td>
+                      <td className="px-4 py-4 text-right font-bold text-red-400 whitespace-nowrap">-{tx.amount.toLocaleString('vi-VN')}</td>
+                      <td className="px-4 py-4">
+                        <div className="space-y-1">
                           {tx.metadata?.keys && Array.isArray(tx.metadata.keys) ? (
-                            tx.metadata.keys.map((k: any, idx: number) => {
+                            tx.metadata.keys.slice(0, 2).map((k: any, idx: number) => {
                               const keyStr = typeof k === 'string' ? k : k.code;
-                              const expiry = typeof k === 'object' && k.expiry ? new Date(k.expiry).toLocaleString('vi-VN') : 'N/A';
+                              const expiry = typeof k === 'object' && k.expiry ? new Date(k.expiry).toLocaleDateString('vi-VN') : 'N/A';
                               return (
-                                <div key={idx} className="bg-dark-900 p-2 rounded border border-gold-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:border-gold-500/60 transition">
-                                  <span className="font-mono text-gold-400 font-bold select-all text-xs">{keyStr}</span>
-                                  <span className="text-xs text-gray-500 whitespace-nowrap">Hết: {expiry}</span>
+                                <div key={idx} className="bg-dark-900 p-1.5 rounded border border-gold-500/30 text-xs">
+                                  <div className="font-mono text-gold-400 font-bold truncate">{keyStr}</div>
+                                  <div className="text-gray-500 text-xs">HH: {expiry}</div>
                                 </div>
                               );
                             })
                           ) : (
-                            <span className="text-gray-500 italic text-xs">Không có thông tin key</span>
+                            <span className="text-gray-500 italic text-xs">Không có key</span>
+                          )}
+                          {tx.metadata?.keys && Array.isArray(tx.metadata.keys) && tx.metadata.keys.length > 2 && (
+                            <div className="text-xs text-gold-400 font-semibold">+{tx.metadata.keys.length - 2} key khác</div>
                           )}
                         </div>
                       </td>

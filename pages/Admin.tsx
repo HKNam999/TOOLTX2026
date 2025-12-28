@@ -205,23 +205,23 @@ const Admin: React.FC = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-gray-400 border-b border-gray-700">
-                      <th className="text-left py-3 px-4">User</th>
-                      <th className="text-left py-3 px-4">Loại</th>
-                      <th className="text-right py-3 px-4">Số Tiền</th>
-                      <th className="text-left py-3 px-4">Trạng Thái</th>
-                      <th className="text-left py-3 px-4">Thời Gian</th>
+                      <th className="text-left py-3 px-4 whitespace-nowrap">User</th>
+                      <th className="text-left py-3 px-4 whitespace-nowrap">Loại</th>
+                      <th className="text-right py-3 px-4 whitespace-nowrap">Số Tiền</th>
+                      <th className="text-left py-3 px-4 whitespace-nowrap">Trạng Thái</th>
+                      <th className="text-left py-3 px-4 whitespace-nowrap">Thời Gian</th>
                     </tr>
                   </thead>
                   <tbody>
                     {transactions.slice(0, 5).map(tx => (
                       <tr key={tx.id} className="border-b border-gray-700/30 hover:bg-dark-700/50 transition">
-                        <td className="py-3 px-4 font-mono text-xs text-gray-300">{tx.userId}</td>
-                        <td className="py-3 px-4 text-gray-400">
+                        <td className="py-3 px-4 font-mono text-xs text-gray-300 whitespace-nowrap">{tx.userId}</td>
+                        <td className="py-3 px-4 text-gray-400 whitespace-nowrap">
                           {tx.type === TransactionType.DEPOSIT ? '💳 Nạp' : '🎁 Mua Key'}
                         </td>
-                        <td className="py-3 px-4 text-right font-bold text-green-400">{tx.amount.toLocaleString()}</td>
-                        <td className="py-3 px-4">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        <td className="py-3 px-4 text-right font-bold text-green-400 whitespace-nowrap">{tx.amount.toLocaleString()}</td>
+                        <td className="py-3 px-4 whitespace-nowrap">
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold inline-block ${
                             tx.status === TransactionStatus.SUCCESS
                               ? 'bg-green-600/30 text-green-400'
                               : 'bg-yellow-600/30 text-yellow-400'
@@ -229,7 +229,7 @@ const Admin: React.FC = () => {
                             {tx.status === TransactionStatus.SUCCESS ? '✓ Thành công' : '⏳ Chờ duyệt'}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-gray-400 text-xs">
+                        <td className="py-3 px-4 text-gray-400 text-xs whitespace-nowrap">
                           {new Date(tx.createdAt).toLocaleDateString('vi-VN')}
                         </td>
                       </tr>
@@ -249,11 +249,11 @@ const Admin: React.FC = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-gray-400 border-b border-gray-700">
-                    <th className="text-left py-3 px-4">User</th>
-                    <th className="text-left py-3 px-4">Nội Dung</th>
-                    <th className="text-right py-3 px-4">Số Tiền</th>
-                    <th className="text-left py-3 px-4">Trạng Thái</th>
-                    <th className="text-left py-3 px-4">Action</th>
+                    <th className="text-left py-3 px-4 whitespace-nowrap">User</th>
+                    <th className="text-left py-3 px-4 whitespace-nowrap">Nội Dung</th>
+                    <th className="text-right py-3 px-4 whitespace-nowrap">Số Tiền</th>
+                    <th className="text-left py-3 px-4 whitespace-nowrap">Trạng Thái</th>
+                    <th className="text-left py-3 px-4 whitespace-nowrap">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -261,11 +261,11 @@ const Admin: React.FC = () => {
                     .filter(t => t.type === TransactionType.DEPOSIT)
                     .map(tx => (
                       <tr key={tx.id} className="border-b border-gray-700/30 hover:bg-dark-700/50 transition">
-                        <td className="py-3 px-4 font-mono text-xs text-gray-300">{tx.userId}</td>
-                        <td className="py-3 px-4 text-gray-400 font-mono">{tx.description}</td>
-                        <td className="py-3 px-4 text-right font-bold text-green-400">{tx.amount.toLocaleString()}</td>
-                        <td className="py-3 px-4">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        <td className="py-3 px-4 font-mono text-xs text-gray-300 whitespace-nowrap">{tx.userId}</td>
+                        <td className="py-3 px-4 text-gray-400 font-mono whitespace-nowrap overflow-hidden text-ellipsis max-w-xs">{tx.description}</td>
+                        <td className="py-3 px-4 text-right font-bold text-green-400 whitespace-nowrap">{tx.amount.toLocaleString()}</td>
+                        <td className="py-3 px-4 whitespace-nowrap">
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold inline-block ${
                             tx.status === TransactionStatus.SUCCESS
                               ? 'bg-green-600/30 text-green-400'
                               : 'bg-yellow-600/30 text-yellow-400'
@@ -273,11 +273,11 @@ const Admin: React.FC = () => {
                             {tx.status === TransactionStatus.SUCCESS ? '✓ Thành công' : '⏳ Chờ duyệt'}
                           </span>
                         </td>
-                        <td className="py-3 px-4">
+                        <td className="py-3 px-4 whitespace-nowrap">
                           {tx.status === TransactionStatus.PENDING && (
                             <button
                               onClick={() => handleApprove(tx.id)}
-                              className="bg-green-600 hover:bg-green-500 text-white text-xs px-4 py-2 rounded-lg font-semibold transition"
+                              className="bg-green-600 hover:bg-green-500 text-white text-xs px-4 py-2 rounded-lg font-semibold transition whitespace-nowrap"
                             >
                               Duyệt
                             </button>
