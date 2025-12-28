@@ -24,7 +24,10 @@ const ProtectedRoute: React.FC<React.PropsWithChildren> = ({ children }) => {
 
 const AdminRoute: React.FC<React.PropsWithChildren> = ({ children }) => {
   const user = storageService.getCurrentUser();
-  if (!user || user.role !== UserRole.ADMIN) {
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  if (user.role !== UserRole.ADMIN) {
     return <Navigate to="/dashboard" replace />;
   }
   return <>{children}</>;
