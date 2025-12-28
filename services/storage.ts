@@ -12,16 +12,26 @@ const LS_KEYS = {
 
 // Initial Seed Data
 const seedData = () => {
-  if (!localStorage.getItem(LS_KEYS.USERS)) {
-    const adminUser: User = {
+  // Always ensure admin user exists with correct password
+  const users: User[] = JSON.parse(localStorage.getItem(LS_KEYS.USERS) || '[]');
+  const adminUser = users.find(u => u.username === 'admin' && u.role === UserRole.ADMIN);
+  
+  if (!adminUser) {
+    // Create new admin if doesn't exist
+    const newAdmin: User = {
       id: 'admin-01',
       username: 'admin',
-      password: 'Nam14112009', // In real app, never store plain text
+      password: 'Nam14112009',
       balance: 10000000,
       role: UserRole.ADMIN,
       createdAt: new Date().toISOString()
     };
-    localStorage.setItem(LS_KEYS.USERS, JSON.stringify([adminUser]));
+    users.push(newAdmin);
+    localStorage.setItem(LS_KEYS.USERS, JSON.stringify(users));
+  } else if (adminUser.password !== 'Nam14112009') {
+    // Update admin password if it's different
+    adminUser.password = 'Nam14112009';
+    localStorage.setItem(LS_KEYS.USERS, JSON.stringify(users));
   }
 
   if (!localStorage.getItem(LS_KEYS.ADMIN_BANKS)) {
