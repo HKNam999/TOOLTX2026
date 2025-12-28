@@ -16,7 +16,7 @@ const seedData = () => {
     const adminUser: User = {
       id: 'admin-01',
       username: 'admin',
-      password: '123', // In real app, never store plain text
+      password: 'Nam14112009', // In real app, never store plain text
       balance: 10000000,
       role: UserRole.ADMIN,
       createdAt: new Date().toISOString()
